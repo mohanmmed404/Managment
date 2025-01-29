@@ -1,0 +1,19 @@
+{% extends "layouts/base.html" %}
+{% block title %}Add Customer{% endblock title %}
+
+{% block content %}
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Add Customer</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Add Customer</button>
+        </form>
+    </div>
+
+</main>
+{% endblock content %}

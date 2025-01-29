@@ -1,0 +1,129 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Manage Customers{% endblock title %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+<main class="content">
+    {% include 'includes/navigation.html' %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                    <li class="breadcrumb-item"><a href="#">Volt</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Manage Customers</li>
+                </ol>
+            </nav>
+            <h2 class="h4">Manage Customers</h2>
+            <p class="mb-0">View, edit, and manage customer profiles efficiently.</p>
+        </div>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{% url 'add_user' %}" class="btn btn-primary btn-sm">Add New Customer</a>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="input-group mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search for customers..." aria-label="Search for customers">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+    </div>
+
+    <!-- Success and Error Messages -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Customer List Table -->
+    <div class="card card-body border-light shadow-sm table-wrapper table-responsive">
+        <table class="table table-hover" id="customersTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Branch</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="customer-name">{{ customer.user.first_name }} {{ customer.user.last_name }}</td>
+                    <td>{{ customer.phone }}</td>
+                    <td>
+                        {% for branch in customer.branches.all %}
+                            {{ branch.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'edit_customer' customer.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="card-footer px-3 border-0 d-flex align-items-center justify-content-between">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination mb-0">
+                <li class="page-item">
+                    <a class="page-link" href="#">Previous</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item active">
+                    <a class="page-link" href="#">2</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">3</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="font-weight-bold small">Showing <b>{{ customers|length }}</b> entries</div>
+    </div>
+</main>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('#customersTable tbody tr');
+
+    searchInput.addEventListener('keyup', () => {
+        const query = searchInput.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const customerName = row.querySelector('.customer-name').textContent.toLowerCase();
+            if (customerName.includes(query)) {
+                row.style.display = ''; // Show row
+            } else {
+                row.style.display = 'none'; // Hide row
+            }
+        });
+    });
+});
+</script>
+{% endblock javascripts %}
